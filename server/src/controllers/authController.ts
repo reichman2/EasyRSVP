@@ -1,17 +1,16 @@
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../generated/prisma';
 import { generateAuthToken } from '../utils/authtoken';
 
 import { Request, Response } from 'express';
+import { serverErrorMessage, invalidMessage } from '../utils/constants';
 
 
 const prisma = new PrismaClient();
-const invalidMessage = "Invalid email or password.";
-const serverErrorMessage = "Internal server error.";
 
 // register route
 export const register = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password, firstName, lastName } = req.body;
 
     try {
         // Search for an existing user
@@ -24,6 +23,8 @@ export const register = async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await prisma.user.create({
             data: {
+                firstName,
+                lastName,
                 email,
                 password: hashedPassword
             }
