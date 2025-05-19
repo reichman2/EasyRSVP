@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 
 import authRoutes from './routes/authRoutes';
+import eventRoutes from './routes/eventRoutes';
 
 
 dotenv.config();
@@ -18,6 +19,9 @@ app.get('/', (req, res) => {
 
 // Login and register routes
 app.use('/api/auth', authRoutes);
+
+// Event routes
+app.use('/api/events', eventRoutes);
 
 
 
