@@ -1,3 +1,4 @@
+import React from 'react';
 
 interface CardProps extends React.PropsWithChildren {
     className?: string;
@@ -8,7 +9,7 @@ const Card = (props: CardProps) => {
 
     return (
         <div className={ `${className}` }>
-            <div className="bg-white shadow-sm rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
+            <div className="bg-white shadow-sm rounded-lg hover:shadow-md transition-shadow duration-300">
                 { children }
             </div>
         </div>
