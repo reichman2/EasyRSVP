@@ -8,7 +8,14 @@ import DashboardPage from '../pages/DashboardPage';
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     const { token } = useAuth();
+    console.log("logged in: ", token);
     return token ? children : <Navigate to="/login" />;
+}
+
+const Logout = () => {
+    const { logout } = useAuth();
+    logout();
+    return <Navigate to="/login" />;
 }
 
 
@@ -19,6 +26,7 @@ const AppRoutes = () => {
             <Route path="/dashboard" element={ <ProtectedRoute><DashboardPage /></ProtectedRoute> } />
             <Route path="/login" element={ <LoginPage /> } />
             <Route path="/register" element={ <RegisterPage />} />
+            <Route path="/logout" element={ <ProtectedRoute><Logout /></ProtectedRoute> } />
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     );
