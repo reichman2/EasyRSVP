@@ -1,6 +1,7 @@
 import Button from "../components/Button";
 import Card from "../components/Card";
 import "../assets/styles/LoginPage.css";
+import Input from "../components/Input";
 
 
 const LoginPage = () => {
@@ -10,8 +11,8 @@ const LoginPage = () => {
                 <div className="block md:flex w-full m-0 p-0">
                     <div className="md:flex-1/2 p-4">
                         <h1>Login</h1>
-                        <input type="email" placeholder="Email" />
-                        <input type="password" placeholder="Password" />
+                        <Input className="m-2" type="email" placeholder="Email" />
+                        <Input className="m-2" type="password" placeholder="Password" />
                         <Button className="shadow-sm hover:shadow-md transition-shadow duration-300">Login</Button>
                     </div>
                     <div className="card-image md:flex-1/2 bg-cover bg-no-repeat bg-center rounded-l-md rounded-r-lg">
