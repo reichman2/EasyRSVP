@@ -32,13 +32,11 @@ const LoginPage = () => {
             const res = await API.post("/auth/login", { email, password });
             login(res.data.token);
 
-            console.log("Login successful, going to dashboard.")
-
             // redirect to dashboard
             window.location.href = "/dashboard";
         } catch (err: any) {
             setErrorMsg(err.response?.data?.message);
-            console.error(errorMsg);
+            console.error(err.response?.data?.message);
         }
     };
 

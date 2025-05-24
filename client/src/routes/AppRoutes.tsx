@@ -8,7 +8,6 @@ import DashboardPage from '../pages/DashboardPage';
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     const { token } = useAuth();
-    console.log("logged in: ", token);
     return token ? children : <Navigate to="/login" />;
 }
 
