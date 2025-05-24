@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router';
 import { useAuth } from '../context/AuthContext';
-import { JSX } from 'react';
+import { JSX, useEffect } from 'react';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import DashboardPage from '../pages/DashboardPage';
@@ -13,7 +13,9 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 
 const Logout = () => {
     const { logout } = useAuth();
-    logout();
+    useEffect(() => {
+        logout();
+    }, []);
     return <Navigate to="/login" />;
 }
 
