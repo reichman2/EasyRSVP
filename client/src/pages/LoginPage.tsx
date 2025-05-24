@@ -46,7 +46,7 @@ const LoginPage = () => {
             <div className="sm:p-0 p-3 lg:mt-35 sm:mt-20">
                 <Card className="lg:w-4xl md:w-2xl sm:w-md mx-auto p-0">
                     <div className="md:flex w-full m-0">
-                        <div className="md:flex-1/2 px-8 py-12">
+                        <div className="md:flex-1/2 px-8 pt-12 pb-6">
                             <div className="">
                                 <h1 className="text-center text-2xl font-semibold">Welcome back!</h1>
                             </div>
@@ -76,6 +76,9 @@ const LoginPage = () => {
                                 </div>
 
                                 <Button className="shadow-sm hover:shadow-md transition-[shadow, colors] duration-300 h-8 hover:bg-teal-700" type="submit" onClick={ handleLogin }>Login</Button>
+
+
+                            <p className="mt-6 text-sm font-semibold text-center">Don't have an account? <a className="text-teal-700 hover:text-teal-600 transition-colors duration-200" href="/register">Register here!</a></p>
                             </div>
                         </div>
                         <div className="card-image md:flex-1/2 bg-cover bg-no-repeat bg-center rounded-l-md rounded-r-lg"></div>
