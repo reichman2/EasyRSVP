@@ -11,6 +11,11 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     return token ? children : <Navigate to="/login" />;
 }
 
+const LoggedOutOnlyRoute = ({ children }: { children: JSX.Element }) => {
+    const { token } = useAuth();
+    return !token ? children : <Navigate to="/dashboard" />;
+}
+
 const Logout = () => {
     const { logout } = useAuth();
     useEffect(() => {
@@ -25,8 +30,8 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/" element={ <ProtectedRoute><h1>/</h1></ProtectedRoute> } />
             <Route path="/dashboard" element={ <ProtectedRoute><DashboardPage /></ProtectedRoute> } />
-            <Route path="/login" element={ <LoginPage /> } />
-            <Route path="/register" element={ <RegisterPage />} />
+            <Route path="/login" element={ <LoggedOutOnlyRoute><LoginPage /></LoggedOutOnlyRoute> } />
+            <Route path="/register" element={ <LoggedOutOnlyRoute><RegisterPage /></LoggedOutOnlyRoute> } />
             <Route path="/logout" element={ <ProtectedRoute><Logout /></ProtectedRoute> } />
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>

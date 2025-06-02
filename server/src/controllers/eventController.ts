@@ -55,7 +55,7 @@ export const getEvents = async (req: AuthRequest, res: Response) => {
                 creatorId: userId
             }
         });
-        res.status(200).json({ length: events.length, events });
+        res.status(200).json({ length: events.length, events, });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: serverErrorMessage });
@@ -202,9 +202,9 @@ export const modifyEvent = async (req: AuthRequest, res: Response) => {
     }
 }
 
-// DELETE /api/events/
+// DELETE /api/events/:id
 export const deleteEvent = async (req: AuthRequest, res: Response) => {
-    const { eventId } = req.body;
+    const { eventId } = req.params;
 
     try {
         const event = await prisma.event.delete({
