@@ -5,6 +5,7 @@ import Input from "../components/Input";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import API from "../api/axios";
+import { loginUser } from "../api/apiService";
 
 
 const LoginPage = () => {
@@ -13,6 +14,7 @@ const LoginPage = () => {
     const [errorMsg, setErrorMsg] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
+
     const { login } = useAuth();
 
     const handleLogin = async () => {
@@ -25,18 +27,19 @@ const LoginPage = () => {
         }
 
         if (!email || !password) {
+            console.error("Email and password are required");
             return;
         }
 
         try {
-            const res = await API.post("/auth/login", { email, password });
-            login(res.data.token);
+            const { token } = await loginUser({ email, password });
+            login(token);
 
-            // redirect to dashboard
             window.location.href = "/dashboard";
         } catch (err: any) {
-            setErrorMsg(err.response?.data?.message);
-            console.error(err.response?.data?.message);
+            setErrorMsg(err.message || "Login failed. Please try again.");
+            console.error(err);
+            return;
         }
     };
 
