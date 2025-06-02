@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "login",
+    "description": "Defines the basic structure of a login response.",
+    "type": "object",
+    "properties": {
+        "token": {
+            "type": "string",
+            "description": "The auth token for the user."
+        },
+        "message": {
+            "type": "string",
+            "description": "A message detailing any errors."
+        }
+    },
+
+    "required": ["token"],
+    "additionalProperties": false
+}

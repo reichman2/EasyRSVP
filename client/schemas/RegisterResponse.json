@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "register",
+    "description": "Defines the basic structure of a register response.",
+    "type": "object",
+    "properties": {
+        "token": {
+            "type": "string",
+            "description": "The auth token for the newly registed user."
+        },
+        "message": {
+            "type": "string",
+            "description": "A message detailing any errors."
+        }
+    },
+
+    "required": ["token"],
+    "additionalProperties": false
+}

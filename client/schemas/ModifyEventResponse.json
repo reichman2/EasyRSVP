@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "modify event",
+    "description": "Defines the basic structure of a modify event response.",
+    "type": "object",
+    "properties": {
+        "message": {
+            "type": "string",
+            "description": "A message with more information about the response (ie. success/error details)."
+        },
+        "event": {
+            "$ref": "https://example.com/schemas/objects/Event.json"
+        }
+    },
+
+    "required": ["event"]
+}

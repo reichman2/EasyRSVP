@@ -1,0 +1,50 @@
+{
+    "$id": "https://example.com/schemas/objects/RSVP.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "The unique id for the RSVP."
+        },
+        "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date and time when the RSVP was created."
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the person who submitted the RSVP."
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "description": "The email address of the person who submitted the RSVP."
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "ACCEPTED",
+                "DECLINED",
+                "MAYBE"
+            ]
+        },
+        "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date and time when the RSVP was last updated."
+        },
+        "eventId": {
+            "type": "string",
+            "description": "The id of the event that the RSVP is for."
+        },
+
+        "rsvps": {
+            "type": "array",
+            "items": {
+                "$ref": "./RSVP.json"
+            },
+            "description": "An array of RSVPs associated with the event."
+        }
+    }
+}
