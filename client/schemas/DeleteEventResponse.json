@@ -1,0 +1,99 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "delete event",
+    "description": "Defines the basic structure of a delete event response.",
+    "type": "object",
+    "properties": {
+        "message": {
+            "type": "string",
+            "description": "A message with more information about the response (ie. success/error details)."
+        },
+        "event": {
+            "type": "object",
+            "description": "The newly created event object.",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The unique identifier for the event."
+                },
+                "title": {
+                    "type": "string",
+                    "description": "The title of the event."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "The description of the event."
+                },
+                "location": {
+                    "type": "string",
+                    "description": "The location of the event."
+                },
+                "startDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The start date and time of the event."
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date and time when the database entry for the event was created."
+                },
+                "slug": {
+                    "type": "string",
+                    "description": "The unique slug for the event which is used in the URL to access the event from the client."
+                },
+                "rsvpToken": {
+                    "type": "string",
+                    "description": "The token used to have permission to view and submit RSVPs to the event."
+                },
+                "creatorId": {
+                    "type": "string",
+                    "description": "The id of the user who created the event."
+                },
+                "rsvps": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "description": "The unique id for the RSVP."
+                            },
+                            "createdAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "The date and time when the RSVP was created."
+                            },
+                            "name": {
+                                "type": "string",
+                                "description": "The name of the person who submitted the RSVP."
+                            },
+                            "email": {
+                                "type": "string",
+                                "format": "email",
+                                "description": "The email address of the person who submitted the RSVP."
+                            },
+                            "status": {
+                                "type": "string",
+                                "enum": [
+                                    "ACCEPTED",
+                                    "DECLINED",
+                                    "MAYBE"
+                                ]
+                            },
+                            "updatedAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "The date and time when the RSVP was last updated."
+                            },
+                            "eventId": {
+                                "type": "string",
+                                "description": "The id of the event that the RSVP is for."
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
