@@ -9,7 +9,9 @@
             "description": "A message with more information about the response (ie. success/error details)."
         },
         "event": {
-            "$ref": "./objects/Event.json"
+            "$ref": "https://example.com/schemas/objects/Event.json"
         }
-    }
+    },
+
+    "required": ["event"]
 }

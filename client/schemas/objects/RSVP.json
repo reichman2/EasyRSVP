@@ -1,4 +1,6 @@
 {
+    "$id": "https://example.com/schemas/objects/RSVP.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
         "id": {
