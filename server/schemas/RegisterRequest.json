@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://example.com/schemas/RegisterRequest.json",
+    "title": "RegisterRequest",
+    "type": "object",
+    "properties": {
+        "email": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 320,
+            "format": "email",
+            "description": "The email of the user registering for a new account."
+        },
+        "firstName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "The first name of the user registering for a new account."
+        },
+        "lastName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The last name of the user registering for a new account."
+        },
+        "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128,
+            "description": "The password of the user registering for a new account."
+        }
+    },
+
+    "required": ["email", "firstName", "lastName", "password"],
+    "additionalProperties": false
+}

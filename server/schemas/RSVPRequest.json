@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://example.com/schemas/RSVPRequest.json",
+    "title": "RSVPRequest",
+    "type": "object",
+    "properties": {
+        "eventId": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 36
+        },
+        "rsvpToken": {
+            "type": "string",
+            "minLength": 36,
+            "maxLength": 36,
+            "format": "uuid"
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 320
+        },
+        "status": {
+            "type": "string",
+            "enum": ["ACCEPTED", "DECLINED", "MAYBE"]
+        }
+    },
+
+    "required": ["eventId", "rsvpToken"],
+    "additionalProperties": false
+}

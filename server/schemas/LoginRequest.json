@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://example.com/schemas/LoginRequest.json",
+    "title": "LoginRequest",
+    "type": "object",
+    "properties": {
+        "email": {
+            "type": "string",
+            "minLength": 5,
+            "format": "email",
+            "description": "The email of the user attempting to log in."
+        },
+        "password": {
+            "type": "string",
+            "minLength": 8,
+            "description": "The password of the user attempting to log in."
+        }
+    },
+
+    "required": ["email", "password"],
+    "additionalProperties": false
+}
