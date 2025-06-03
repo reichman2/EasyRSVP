@@ -4,12 +4,21 @@ import { generateAuthToken } from '../utils/authtoken';
 
 import { Request, Response } from 'express';
 import { serverErrorMessage, invalidMessage } from '../utils/constants';
+import validateSchema from '../utils/validateSchema';
 
 
 const prisma = new PrismaClient();
 
 // register route
 export const register = async (req: Request, res: Response) => {
+    // Validate request body
+    const requestIsValid = validateSchema(req.body, 'register');
+    if (!requestIsValid) {
+        res.status(400).json({ message: "Invalid request body." });
+        return;
+    }
+
+    // Handle the request
     const { email, password, firstName, lastName } = req.body;
 
     try {
@@ -40,6 +49,14 @@ export const register = async (req: Request, res: Response) => {
 
 // login route
 export const login = async (req: Request, res: Response) => {
+    // Validate request body
+    const requestIsValid = validateSchema(req.body, 'login');
+    if (!requestIsValid) {
+        res.status(400).json({ message: "Invalid request body." });
+        return;
+    }
+
+    // Handle the request
     const { email, password } = req.body;
 
     try {
