@@ -59,6 +59,7 @@ enum RSVPStatus {
   ACCEPTED
   DECLINED
   MAYBE
+  PENDING
 }
 
 enum UserRole {
