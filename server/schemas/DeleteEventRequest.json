@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://example.com/schemas/DeleteEventRequest.json",
+    "title": "DeleteEventRequest",
+    "type": "object",
+    "properties": {
+        "eventId": {
+            "type": "string",
+            "maxLength": 32
+        }
+    },
+
+    "required": ["eventId"],
+    "additionalProperties": false
+}
