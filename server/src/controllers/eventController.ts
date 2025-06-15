@@ -42,7 +42,7 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
 // GET /api/events
 export const getEvents = async (req: AuthRequest, res: Response) => {
     const userId = req.userId;
-    const { limit = -1, offset = -1 } = req.body;
+    const { limit = -1, offset = -1 } = req.params;
 
     try {
         const events = await prisma.event.findMany({
