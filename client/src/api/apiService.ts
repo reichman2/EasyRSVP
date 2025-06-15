@@ -1,5 +1,6 @@
 import API from "./axios";
 import ajv from "ajv";
+import addFormats from "ajv-formats";
 
 import * as loginResponseSchema from "../../schemas/LoginResponse.json";
 import * as registerResponseSchema from "../../schemas/RegisterResponse.json";
@@ -85,6 +86,7 @@ const OBJECT_SCHEMAS = [
 export const validateResponse = (obj: any, schema: keyof typeof SCHEMAS) => {
     if (obj && schema) {
         const validator = new ajv({ schemas: OBJECT_SCHEMAS });
+        addFormats(validator);
         const validate = validator.compile(SCHEMAS[schema]);
 
         return validate(obj);
