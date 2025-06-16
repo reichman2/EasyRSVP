@@ -22,8 +22,12 @@ model User {
   firstName   String
   lastName    String
   password    String
+
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+
   events      Event[]
+  rsvps       RSVP[]
 }
 
 model Event {
@@ -33,8 +37,13 @@ model Event {
   location String
   startDate DateTime
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
   slug String @unique
   rsvpToken String @unique @default(uuid())
+  coverImage EventCoverImage?
+
+  creationStatus CreationStatus @default(DRAFT)
+  status EventStatus @default(UPCOMING)
 
   creatorId String
   creator User @relation(fields: [creatorId], references: [id])
@@ -52,7 +61,45 @@ model RSVP {
   eventId String
   event Event @relation(fields: [eventId], references: [id])
 
+  userId String?
+  user User? @relation(fields: [userId], references: [id])
+
   @@unique ([eventId, email])
+}
+
+model EventCoverImage {
+  id String @id @default(cuid())
+
+  imageId String
+  image Image @relation(fields: [imageId], references: [id])
+
+  eventId String? @unique
+  event Event? @relation(fields: [eventId], references: [id])
+}
+
+model Image {
+  id String @id @default(cuid())
+  url String
+  altText String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+
+  EventCoverImage EventCoverImage[]
+}
+
+
+enum CreationStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EventStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
 }
 
 enum RSVPStatus {
