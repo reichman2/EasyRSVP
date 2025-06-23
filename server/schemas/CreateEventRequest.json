@@ -18,6 +18,11 @@
             "type": "string",
             "foramt": "date-time"
         },
+        "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The end date and time of the event. Defaults to 2 hours after the start date if not provided."
+        },
         "location": {
             "type": "string",
             "minLength": 0,
