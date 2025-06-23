@@ -36,6 +36,7 @@ model Event {
   description String
   location String
   startDate DateTime
+  endDate DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
   slug String @unique
