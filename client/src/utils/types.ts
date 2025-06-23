@@ -30,4 +30,7 @@ export type Event = {
     slug: string;
     rsvpToken: string;
     rsvps?: RSVP[];
+
+    status: "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED";
+    creationStatus: "DRAFT" | "PUBLISHED" | "ARCHIVED";
 };
