@@ -4,6 +4,10 @@
     "title": "GetEventsRequest",
     "type": "object",
     "properties": {
+        "userId": {
+            "type": "string",
+            "description": "The ID of the user whose events are being requested. If not provided, all public events will be returned."
+        },
         "limit": {
             "type": "integer",
             "minimum": -1,

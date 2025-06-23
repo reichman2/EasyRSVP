@@ -53,9 +53,19 @@ export const getEvents = async (req: AuthRequest, res: Response) => {
             },
             where: {
                 creatorId: userId
+            },
+            include: {
+                rsvps: true,
+                creator: {
+                    select: {
+                        email: true,
+                        firstName: true,
+                        lastName: true,
+                    }
+                }
             }
         });
-        res.status(200).json({ length: events.length, events, });
+        res.status(200).json({ length: events.length, events });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: serverErrorMessage });

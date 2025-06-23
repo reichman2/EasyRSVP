@@ -24,6 +24,7 @@ export type Event = {
     description: string;
     location: string;
     startDate: Date;
+    endDate?: Date;
     createdAt: Date;
     creatorId: string;
     slug: string;

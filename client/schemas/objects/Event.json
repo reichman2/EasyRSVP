@@ -25,10 +25,20 @@
             "format": "date-time",
             "description": "The start date and time of the event."
         },
+        "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The end date and time of the event. Defaults to 2 hours after the start date if not provided."
+        },
         "createdAt": {
             "type": "string",
             "format": "date-time",
             "description": "The date and time when the database entry for the event was created."
+        },
+        "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date and time when the database entry for the event was last updated."
         },
         "slug": {
             "type": "string",
@@ -41,6 +51,33 @@
         "creatorId": {
             "type": "string",
             "description": "The id of the user who created the event."
+        },
+        "creationStatus": {
+            "type": "string",
+            "enum": [
+                "DRAFT",
+                "PUBLISHED",
+                "ARCHIVED"
+            ],
+            "description": "The 'creation' status of the event, indiciating whether it is a draft, published, or archived."
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "UPCOMING",
+                "ONGOING",
+                "COMPLETED",
+                "CANCELLED"
+            ],
+            "description": "The current status of the event (i.e. whether it is upcoming, ongoing, completed, or cancelled)."
+        },
+
+        "rsvps": {
+            "type": "array",
+            "items": {
+                "$ref": "https://example.com/schemas/objects/RSVP.json"
+            },
+            "description": "An array of RSVPs associated with the event."
         }
     }
 }

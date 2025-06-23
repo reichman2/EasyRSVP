@@ -37,14 +37,6 @@
         "eventId": {
             "type": "string",
             "description": "The id of the event that the RSVP is for."
-        },
-
-        "rsvps": {
-            "type": "array",
-            "items": {
-                "$ref": "./RSVP.json"
-            },
-            "description": "An array of RSVPs associated with the event."
         }
     }
 }
