@@ -7,46 +7,7 @@
         "newEvent": {
             "type": "object",
             "description": "The newly created event object.",
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "description": "The unique identifier for the event."
-                },
-                "title": {
-                    "type": "string",
-                    "description": "The title of the event."
-                },
-                "description": {
-                    "type": "string",
-                    "description": "The description of the event."
-                },
-                "location": {
-                    "type": "string",
-                    "description": "The location of the event."
-                },
-                "startDate": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The start date and time of the event."
-                },
-                "createdAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The date and time when the database entry for the event was created."
-                },
-                "slug": {
-                    "type": "string",
-                    "description": "The unique slug for the event which is used in the URL to access the event from the client."
-                },
-                "rsvpToken": {
-                    "type": "string",
-                    "description": "The token used to have permission to view and submit RSVPs to the event."
-                },
-                "creatorId": {
-                    "type": "string",
-                    "description": "The id of the user who created the event."
-                }
-            }
+            "$ref": "https://example.com/schemas/objects/Event.json"
         },
         "message": {
             "type": "string",
