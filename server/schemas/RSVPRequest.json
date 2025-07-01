@@ -12,8 +12,7 @@
         "rsvpToken": {
             "type": "string",
             "minLength": 36,
-            "maxLength": 36,
-            "format": "uuid"
+            "maxLength": 36
         },
         "name": {
             "type": "string",
