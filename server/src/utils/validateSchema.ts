@@ -9,6 +9,7 @@ import * as createEventRequestSchema from '../../schemas/CreateEventRequest.json
 import * as modifyEventRequestSchema from '../../schemas/ModifyEventRequest.json';
 import * as deleteEventRequestSchema from '../../schemas/DeleteEventRequest.json';
 import * as rsvpRequestSchema from '../../schemas/RSVPRequest.json';
+import * as getUserRSVPsRequestSchema from '../../schemas/GetUserRSVPsRequest.json';
 
 
 const SCHEMAS = {
@@ -19,7 +20,8 @@ const SCHEMAS = {
     createEvent: createEventRequestSchema,
     modifyEvent: modifyEventRequestSchema,
     deleteEvent: deleteEventRequestSchema,
-    rsvp: rsvpRequestSchema
+    rsvp: rsvpRequestSchema,
+    getUserRSVPs: getUserRSVPsRequestSchema
 };
 
 
