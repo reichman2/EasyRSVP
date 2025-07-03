@@ -11,7 +11,7 @@ router.get('/', authMiddleware, getEvents);
 // Routes for /:id, /:id/rsvps, /:id/rsvps
 router.get('/rsvps', authMiddleware, getRsvpsForUser);
 router.put('/rsvp', rsvp); 
-router.get('/:id', getEventById);
+router.get('/:eventId', getEventById);
 router.delete('/', authMiddleware, deleteEvent);
 router.put('/', authMiddleware, modifyEvent);
 
