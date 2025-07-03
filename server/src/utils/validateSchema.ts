@@ -33,10 +33,17 @@ const validateSchema = (obj: object, schema: keyof typeof SCHEMAS | object) => {
     }
 
     if (obj) {
-        const ajv = new Ajv();
-        addFormats(ajv, ["date-time", "email"]);
+        const ajv = new Ajv({ coerceTypes: true });
+        addFormats(ajv, ["date-time", "email", "uuid"]);
         const validate = ajv.compile(schema);
-        return validate(obj);
+        const isValid = validate(obj);
+
+        if (!isValid) {
+            console.error("Validation errors:", validate.errors);
+            return false;
+        }
+
+        return true;
     }
 
     return false;
