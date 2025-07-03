@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createEvent, deleteEvent, getEventById, getEvents, modifyEvent, rsvp } from '../controllers/eventController';
+import { createEvent, deleteEvent, getEventById, getEvents, getRsvpsForUser, modifyEvent, rsvp } from '../controllers/eventController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 
@@ -9,8 +9,9 @@ router.post('/', authMiddleware, createEvent);
 router.get('/', authMiddleware, getEvents);
 
 // Routes for /:id, /:id/rsvps, /:id/rsvps
-router.post('/rsvp', rsvp);
-router.get('/:id', getEventById);
+router.get('/rsvps', authMiddleware, getRsvpsForUser);
+router.put('/rsvp', rsvp); 
+router.get('/:eventId', getEventById);
 router.delete('/', authMiddleware, deleteEvent);
 router.put('/', authMiddleware, modifyEvent);
 

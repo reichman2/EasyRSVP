@@ -9,6 +9,7 @@ import * as createEventRequestSchema from '../../schemas/CreateEventRequest.json
 import * as modifyEventRequestSchema from '../../schemas/ModifyEventRequest.json';
 import * as deleteEventRequestSchema from '../../schemas/DeleteEventRequest.json';
 import * as rsvpRequestSchema from '../../schemas/RSVPRequest.json';
+import * as getUserRSVPsRequestSchema from '../../schemas/GetUserRSVPsRequest.json';
 
 
 const SCHEMAS = {
@@ -19,7 +20,8 @@ const SCHEMAS = {
     createEvent: createEventRequestSchema,
     modifyEvent: modifyEventRequestSchema,
     deleteEvent: deleteEventRequestSchema,
-    rsvp: rsvpRequestSchema
+    rsvp: rsvpRequestSchema,
+    getUserRSVPs: getUserRSVPsRequestSchema
 };
 
 
@@ -31,10 +33,17 @@ const validateSchema = (obj: object, schema: keyof typeof SCHEMAS | object) => {
     }
 
     if (obj) {
-        const ajv = new Ajv();
-        addFormats(ajv, ["date-time", "email"]);
+        const ajv = new Ajv({ coerceTypes: true });
+        addFormats(ajv, ["date-time", "email", "uuid"]);
         const validate = ajv.compile(schema);
-        return validate(obj);
+        const isValid = validate(obj);
+
+        if (!isValid) {
+            console.error("Validation errors:", validate.errors);
+            return false;
+        }
+
+        return true;
     }
 
     return false;

@@ -4,12 +4,21 @@ import { serverErrorMessage } from '../utils/constants';
 import { v4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { AuthRequest } from '../middleware/authMiddleware';
+import validateSchema from '../utils/validateSchema';
 
 
 const prisma = new PrismaClient();
 
+
 // POST /api/events
 export const createEvent = async (req: AuthRequest, res: Response) => {
+    // Validate request body
+    const requestIsValid = validateSchema(req.body, 'createEvent');
+    if (!requestIsValid) {
+        res.status(400).json({ message: "Invalid request body." });
+        return;
+    }
+
     const { title, description, startDate, location } = req.body;
     const userId = req.userId;
 
@@ -27,10 +36,10 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
             }
         });
 
-        console.log("userId", userId);
-        console.log("Event data", {
-            title, description, startDate, location
-        });
+        // console.log("userId", userId);
+        // console.log("Event data", {
+        //     title, description, startDate, location
+        // });
 
         res.status(201).json({ message: "Event created successfully", newEvent });
     } catch (err) {
@@ -41,8 +50,15 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
 
 // GET /api/events
 export const getEvents = async (req: AuthRequest, res: Response) => {
+    // Validate request body
+    const requestIsValid = validateSchema(req.query, 'getEvents');
+    if (!requestIsValid) {
+        res.status(400).json({ message: "Invalid request parameters." });
+        return;
+    }
+
     const userId = req.userId;
-    const { limit = -1, offset = -1 } = req.params;
+    const { limit = -1, offset = -1 } = req.query;
 
     try {
         const events = await prisma.event.findMany({
@@ -74,14 +90,22 @@ export const getEvents = async (req: AuthRequest, res: Response) => {
 
 // GET /api/events/:id
 export const getEventById = async (req: Request, res: Response) => {
-    const { id: eventId } = req.params;
+    // Validate request body
+    // console.log("params:", req.params)
+    const requestIsValid = validateSchema(req.params, 'getDetailedEvent');
+    if (!requestIsValid) {
+        res.status(400).json({ message: "Invalid request parameters." });
+        return;
+    }
+
+    const { eventId } = req.params;
     const { rsvpToken } = req.query;
 
     // Get the userId from the request
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = token? (jwt.verify(token, process.env.JWT_SECRET as string) as { userID: string }).userID : undefined;
 
-    console.log("eventId", eventId);
+    // console.log("eventId", eventId);
     
     // TODO -- privacy check?  Maybe users should be issued a special one-time token to view the event.
     //   or if the user who clicks the token in the email has an account, add the token to the account
@@ -130,13 +154,22 @@ export const getEventById = async (req: Request, res: Response) => {
     }
 }
 
-// POST /api/events/rsvp
+// PUT /api/events/rsvp
 export const rsvp = async (req: Request, res: Response) => {
-    const { eventId, rsvpToken } = req.body;
-    const { name, email, status } = req.body;
+    // Validate request body
+    const requestIsValid = validateSchema(req.body, 'rsvp');
+    if (!requestIsValid) {
+        res.status(400).json({ message: "Invalid request body." });
+        return;
+    }
 
-    if (!rsvpToken) {
-        res.status(400).json({ message: "Invalid RSVP token." });
+    const { eventId, rsvpToken, name, email, status } = req.body;
+
+    const token = req.headers['authorization']?.split(' ')[1];
+    let userId: string | undefined;
+    if (token) {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userID: string };
+        userId = decoded.userID;
     }
 
     try {
@@ -151,25 +184,106 @@ export const rsvp = async (req: Request, res: Response) => {
             return;
         }
 
-        const rsvp = await prisma.rSVP.create({
-            data: {
-                eventId,
+        if (!event.rsvpToken || event.rsvpToken !== rsvpToken) {
+            res.status(400).json({ message: "Invalid RSVP token." });
+            return;
+        }
 
-                name,
-                email,
-                status: status,
+        if (status !== "ACCEPTED" && status !== "DECLINED" && status !== "MAYBE") {
+            res.status(400).json({ message: "Invalid RSVP status. Must be ACCEPTED, DECLINED, or MAYBE." });
+            return;
+        }
+
+        const loggedInUser = await prisma.user.findUnique({
+            where: {
+                id: userId || ""
             }
         });
 
-        res.status(200).json({ message: "RSVP created successfully", rsvp });
+        const existingRsvp = await prisma.rSVP.findFirst({
+            where: {
+                eventId: eventId,
+                userId: userId, // If the user is logged in, we can associate the RSVP with their userId
+                email: loggedInUser? loggedInUser.email : email // If the user is not logged in, we can associate the RSVP with their email
+            }
+        });
+
+
+        // console.log("existingRsvp", existingRsvp);
+        // console.log("loggedInUser", loggedInUser);
+
+        if (existingRsvp) {
+            // If the user is logged in, we can modify the existing RSVP.
+            const updatedRsvp = await prisma.rSVP.update({
+                where: {
+                    id: existingRsvp.id
+                },
+                data: {
+                    // Should we update the name and email if the user is logged in?  For now, we will.
+                    name: loggedInUser? loggedInUser.firstName + " " + loggedInUser.lastName : name,
+                    email: loggedInUser? loggedInUser.email : email,
+
+                    status: status
+                }
+            });
+
+            res.status(200).json({ message: "RSVP updated successfully.", rsvp: updatedRsvp });
+        } else {
+            const rsvp = await prisma.rSVP.create({
+                data: {
+                    eventId,
+
+                    name: loggedInUser? loggedInUser.firstName + " " + loggedInUser.lastName : name, // If the user is logged in, we can use their name, otherwise use the provided name
+                    email: loggedInUser? loggedInUser.email : email, // If the user is logged in, we can use their email, otherwise use the provided email
+                    status: status,
+                    userId: loggedInUser? userId : undefined, // If the user is logged in, we can associate the RSVP with their userId
+                }
+            });
+
+            res.status(200).json({ message: "RSVP created successfully", rsvp });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: serverErrorMessage });
     }
 }
 
+export const getRsvpsForUser = async (req: AuthRequest, res: Response) => {
+    // Validate request body
+    const requestIsValid = validateSchema(req.params, 'getUserRSVPs');
+    if (!requestIsValid) {
+        res.status(400).json({ message: "Invalid request parameters." });
+        return;
+    }
+
+    const userId = req.userId;
+
+    try {
+        const rsvps = await prisma.rSVP.findMany({
+            where: {
+                userId: userId
+            },
+            include: {
+                event: true,
+            }
+        });
+        
+        res.status(200).json({ length: rsvps.length, rsvps });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: serverErrorMessage });
+    }
+};
+
 // PUT /api/events/:id
 export const modifyEvent = async (req: AuthRequest, res: Response) => {
+    // Validate request body
+    const requestIsValid = validateSchema(req.body, 'modifyEvent');
+    if (!requestIsValid) {
+        res.status(400).json({ message: "Invalid request body." });
+        return;
+    }
+
     const { eventId, title, description, startDate, location } = req.body;
 
     try {
@@ -195,7 +309,7 @@ export const modifyEvent = async (req: AuthRequest, res: Response) => {
         // TODO -- send email to all users who have RSVP'd to the event.
 
         if (startDate) {
-            console.log("new start date, we should remove all RSVPs");
+            // console.log("new start date, we should remove all RSVPs");
 
             // Remove all RSVPs for the event
             await prisma.rSVP.deleteMany({
@@ -214,6 +328,13 @@ export const modifyEvent = async (req: AuthRequest, res: Response) => {
 
 // DELETE /api/events/:id
 export const deleteEvent = async (req: AuthRequest, res: Response) => {
+    // Validate request body
+    const requestIsValid = validateSchema(req.params, 'deleteEvent');
+    if (!requestIsValid) {
+        res.status(400).json({ message: "Invalid request parameters." });
+        return;
+    }
+
     const { eventId } = req.params;
 
     try {

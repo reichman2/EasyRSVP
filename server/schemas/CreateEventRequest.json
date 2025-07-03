@@ -16,7 +16,7 @@
         },
         "startDate": {
             "type": "string",
-            "foramt": "date-time"
+            "format": "date-time"
         },
         "endDate": {
             "type": "string",
