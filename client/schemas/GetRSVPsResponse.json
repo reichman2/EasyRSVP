@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "get rsvps",
+    "description": "Defines the basic structure of a getRsvps response.",
+    "type": "object",
+    "properties": {
+        "rsvps": {
+            "type": "array",
+            "items": {
+                "$ref": "https://example.com/schemas/objects/RSVP.json"
+            }
+        },
+        "message": {
+            "type": "string"
+        }
+    },
+
+    "required": ["rsvps"]
+}

@@ -284,7 +284,7 @@ export const modifyEvent = async (req: AuthRequest, res: Response) => {
         return;
     }
 
-    const { eventId, title, description, startDate, location } = req.body;
+    const { eventId, title, description, startDate, endDate, location } = req.body;
 
     try {
         const event = await prisma.event.update({
@@ -297,6 +297,7 @@ export const modifyEvent = async (req: AuthRequest, res: Response) => {
                 title: title || undefined,
                 description: description || undefined,
                 startDate: startDate? new Date(startDate) : undefined,
+                endDate: endDate? new Date(endDate) : undefined,
                 location: location || undefined
             }
         });

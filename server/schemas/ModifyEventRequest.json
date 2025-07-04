@@ -22,6 +22,10 @@
             "type": "string",
             "format": "date-time"
         },
+        "endDate": {
+            "type": "string",
+            "format": "date-time"
+        },
         "location": {
             "type": "string",
             "minLength": 0,
