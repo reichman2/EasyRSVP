@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { TokenExpiredError } from 'jsonwebtoken';
 
 
 export interface AuthRequest extends Request {
@@ -18,6 +18,12 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
         const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userID: string };
         req.userId = decoded.userID;
     } catch (err) {
+        if (err instanceof TokenExpiredError) {
+            console.error("Token expired:", err);
+            res.status(401).json({ message: "Token expired" });
+            return;
+        }
+
         console.error(err);
         console.log("!! Invalid token");
         res.status(401).json({ message: "Unauthorized" });
