@@ -15,5 +15,21 @@ API.interceptors.request.use((req) => {
     return req;
 });
 
+// Log the user out if the token is invalid
+API.interceptors.response.use(
+    (res) => res,
+    (err) => {
+        if (err.response && err.response.status === 401 && err.response.data.message === "Token expired") {
+            console.error("Invalid token, logging out...");
+
+            window.location.href = '/logout';
+
+            // localStorage.removeItem('authToken');
+            // window.location.href = '/login'; // Redirect to login page
+        }
+        return Promise.reject(err);
+    }
+);
+
 
 export default API;
