@@ -10,6 +10,7 @@ import * as getEventsResponseSchema from "../../schemas/GetEventsResponse.json";
 import * as rsvpResponseSchema from "../../schemas/RSVPResponse.json";
 import * as deleteEventResponseSchema from "../../schemas/DeleteEventResponse.json";
 import * as modifyEventResponseSchema from "../../schemas/ModifyEventResponse.json";
+import * as getRSVPsResponseSchema from "../../schemas/GetRsvpsResponse.json";
 
 import * as eventObjectSchema from "../../schemas/objects/Event.json";
 import * as rsvpObjectSchema from "../../schemas/objects/RSVP.json";
@@ -75,7 +76,8 @@ const SCHEMAS = {
     deleteEvent: deleteEventResponseSchema,
     getDetailedEvent: getDetailedEventResposneSchema,
     getEvents: getEventsResponseSchema,
-    rsvp: rsvpResponseSchema
+    rsvp: rsvpResponseSchema,
+    getRsvps: getRSVPsResponseSchema
 };
 
 const OBJECT_SCHEMAS = [
@@ -85,7 +87,7 @@ const OBJECT_SCHEMAS = [
 
 export const validateResponse = (obj: any, schema: keyof typeof SCHEMAS) => {
     if (obj && schema) {
-        const validator = new ajv({ schemas: OBJECT_SCHEMAS });
+        const validator = new ajv({ schemas: OBJECT_SCHEMAS, coerceTypes: true });
         addFormats(validator);
         const validate = validator.compile(SCHEMAS[schema]);
 
@@ -269,6 +271,27 @@ export const rsvp = async ({ eventId, rsvpToken, name, email, status }: RSVPRequ
 
         if (!isValid) {
             throw new Error("Response for \"POST /api/events/rsvp\" did not pass validation.");
+        }
+    } catch (err: any) {
+        const message = err.response?.data?.message;
+        if (message) {
+            throw new Error(message);
+        }
+
+        throw err;
+    }
+
+    return res.data;
+};
+
+export const getRsvps = async (): Promise<{ rsvps: RSVP[], message?: string }> => {
+    let res;
+    try {
+        res = await API.get("/events/rsvps");
+        const isValid = validateResponse(res.data, "getRsvps");
+
+        if (!isValid) {
+            throw new Error("Response for \"GET /api/events/rsvps\" did not pass validation.");
         }
     } catch (err: any) {
         const message = err.response?.data?.message;
