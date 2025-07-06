@@ -5,8 +5,207 @@ import Badge from "../components/Badge";
 import { LuChevronLeft, LuChevronRight, LuPencil, LuTrash2 } from "react-icons/lu";
 import { Event } from "../utils/types";
 import Button from "../components/Button";
+import Modal from "../components/Modal";
+import Input from "../components/Input";
+import { createEvent } from "../api/apiService";
+import TextArea from "../components/TextArea";
+import Toast, { ToastProps } from "../components/Toast";
 
 const EventPage = () => {
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [toast, setToast] = useState<ToastProps | null>(null);
+    const [toastVisible, setToastVisible] = useState(false);
+
+    return (
+        <div>
+            { toast &&
+                <Toast 
+                    message={ toast.message }
+                    type={ toast.type }
+                    duration={ toast.duration }
+                    position={ toast.position }
+                    autoClose={ toast.autoClose }
+                    showCloseButton={ toast.showCloseButton }
+                    visible={ toastVisible }
+                    close={ toast.close }
+                />
+            }
+            <EventTable openCreateEventModal={ () => setIsCreateModalOpen(true) } />
+            <CreateEventModal 
+                isOpen={ isCreateModalOpen } 
+                onClose={ () => setIsCreateModalOpen(false) } 
+                setToast={ setToast }
+                toastVisible={ toastVisible }
+                setToastVisible={ setToastVisible }
+            />
+        </div>
+    );
+};
+
+
+const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVisible }: { isOpen: boolean, onClose: () => void, setToast: (toast: ToastProps | null) => void, toastVisible: boolean, setToastVisible: (visible: boolean) => void }) => {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [location, setLocation] = useState("");
+
+    const [titleError, setTitleError] = useState("");
+    const [startDateError, setStartDateError] = useState("");
+
+
+    const closeModal = () => {
+        setTitle("");
+        setDescription("");
+        setStartDate("");
+        setEndDate("");
+        setLocation("");
+        setTitleError("");
+        setStartDateError("");
+        onClose();
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Validate form data
+        if (!title) {
+            setTitleError("Event title is required.");
+        } else {
+            setTitleError("");
+        }
+
+        if (!startDate) {
+            setStartDateError("Start date is required.");
+        } else {
+            setStartDateError("");
+        }
+
+        if (!title || !startDate) {
+            console.error("Event title and start date are required.");
+            return;
+        }
+
+        // Make API call to create event
+        try {
+            await createEvent({
+                title,
+                description,
+                startDate: new Date(startDate).toISOString(),
+                endDate: endDate? new Date(endDate).toISOString() : "",
+                location
+            });
+
+            closeModal();
+
+            setToast({
+                message: "Event created successfully!",
+                type: "success",
+                position: "top-right",
+                autoClose: true,
+                showCloseButton: true,
+                icon: null,
+                visible: toastVisible,
+                close: () => setToastVisible(false)
+            });
+        } catch (error) {
+            console.error("Error creating event:", error);
+
+            setToast({
+                message: error instanceof Error? error.message : "An error occurred while creating the event.",
+                type: "error",
+                position: "top-right",
+                autoClose: true,
+                showCloseButton: true,
+                icon: null,
+                visible: toastVisible,
+                close: () => setToastVisible(false)
+            });
+
+            setToastVisible(true);
+        }
+    };
+
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setStartDate(value);
+
+
+        const date = new Date(value);
+        const datePlusTwoHours = new Date(date.getTime() + 2 * 60 * 60 * 1000); // Add 2 hours
+        // Account for timezone offset
+        const timezoneOffset = datePlusTwoHours.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
+        const adjustedDate = new Date(datePlusTwoHours.getTime() - timezoneOffset);
+
+        // Format the date to match the input type="datetime-local" format
+        const formattedDate = adjustedDate.toISOString().slice(0, 16);
+        setEndDate(formattedDate);
+    }
+
+    return (
+        <Modal isOpen={ isOpen } close={ closeModal }>
+            <div className="md:w-xl sm:w-sm">
+                <h2 className="text-2xl mb-4">Create Event</h2>
+                <form className="space-y-4" onSubmit={ handleSubmit }>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Event Title</label>
+                        <Input 
+                            name="new-event-title" 
+                            type="text" 
+                            error={ !!titleError } 
+                            value={ title }
+                            onChange={ (e) => setTitle(e.target.value) }
+                            onBlur={ (e) => setTitleError(e.target.value? "" : "Event title is required.") }
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Description</label>
+                        <TextArea 
+                            name="new-event-desc" 
+                            rows={ 4 } 
+                            value={ description }
+                            onChange={ (e) => setDescription(e.target.value) }
+                        />
+                    </div>
+                    <div className="flex flex-row justify-between space-x-4">
+                        <div className="grow">
+                            <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                            <Input 
+                                name="new-event-start" 
+                                type="datetime-local" 
+                                error={ !!startDateError } 
+                                value={ startDate }
+                                onChange={ handleDateChange } 
+                            />
+                        </div>
+                        <div className="grow">
+                            <label className="block text-sm font-medium text-gray-700">End Date</label>
+                            <Input 
+                                name="new-event-end" 
+                                type="datetime-local" 
+                                value={ endDate }
+                                onChange={ (e) => setEndDate(e.target.value) }
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Location</label>
+                        <Input 
+                            name="new-event-location" 
+                            type="text" 
+                            value={ location }
+                            onChange={ (e) => setLocation(e.target.value) }
+                        />
+                    </div>
+                    <Button type="submit" className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700">Create Event</Button>
+                </form>
+            </div>
+        </Modal>
+    )
+};
+
+
+const EventTable = ({ openCreateEventModal }: { openCreateEventModal: () => void }) => {
     const [events, setEvents] = useState<any>({});
 
     // TODO make this a hook
@@ -79,7 +278,7 @@ const EventPage = () => {
                             <h1 className="text-2xl mb-4">My Events</h1>
                         </li>
                         <li className="ml-auto">
-                            <Button className="ml-auto px-3 py-1.5 hover:bg-teal-700">+ Create Event</Button>
+                            <Button onClick={ () => openCreateEventModal() } className="ml-auto px-3 py-1.5 hover:bg-teal-700">+ Create Event</Button>
                         </li>
                     </ul>
                     {/* <p className="text-gray-600">This page will display your events.</p> */}

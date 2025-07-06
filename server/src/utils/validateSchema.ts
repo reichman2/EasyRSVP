@@ -40,13 +40,13 @@ const validateSchema = (obj: object, schema: keyof typeof SCHEMAS | object) => {
 
         if (!isValid) {
             console.error("Validation errors:", validate.errors);
-            return false;
+            return [false, validate.errors];
         }
 
-        return true;
+        return [true, []];
     }
 
-    return false;
+    return [false, []];
 }
 
 export default validateSchema;

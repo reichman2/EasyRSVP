@@ -34,6 +34,7 @@ type CreateEventRequestParameters = {
     title: string;
     description: string;
     startDate: Date | string;
+    endDate: Date | string;
     location: string;
 };
 
@@ -158,10 +159,10 @@ export const registerUser = async ({ firstName, lastName, email, password }: Use
     return { token, message };
 };
 
-export const createEvent = async ({ title, description, startDate, location }: CreateEventRequestParameters): Promise<{ message: string, newEvent: Event }> => {
+export const createEvent = async ({ title, description, startDate, endDate, location }: CreateEventRequestParameters): Promise<{ message: string, newEvent: Event }> => {
     let res;
     try {
-        res = await API.post("/events", { title, description, startDate, location });
+        res = await API.post("/events", { title, description, startDate, endDate, location });
         const isValid = validateResponse(res.data, "createEvent");
 
         if (!isValid) {
