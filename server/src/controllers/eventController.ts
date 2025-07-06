@@ -13,9 +13,9 @@ const prisma = new PrismaClient();
 // POST /api/events
 export const createEvent = async (req: AuthRequest, res: Response) => {
     // Validate request body
-    const requestIsValid = validateSchema(req.body, 'createEvent');
+    const [requestIsValid, validationErrors] = validateSchema(req.body, 'createEvent');
     if (!requestIsValid) {
-        res.status(400).json({ message: "Invalid request body." });
+        res.status(400).json({ message: "Invalid request body.", validationErrors });
         return;
     }
 
@@ -51,7 +51,7 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
 // GET /api/events
 export const getEvents = async (req: AuthRequest, res: Response) => {
     // Validate request body
-    const requestIsValid = validateSchema(req.query, 'getEvents');
+    const [requestIsValid, validationErrors] = validateSchema(req.query, 'getEvents');
     if (!requestIsValid) {
         res.status(400).json({ message: "Invalid request parameters." });
         return;
@@ -92,7 +92,7 @@ export const getEvents = async (req: AuthRequest, res: Response) => {
 export const getEventById = async (req: Request, res: Response) => {
     // Validate request body
     // console.log("params:", req.params)
-    const requestIsValid = validateSchema(req.params, 'getDetailedEvent');
+    const [requestIsValid, validationErrors] = validateSchema(req.params, 'getDetailedEvent');
     if (!requestIsValid) {
         res.status(400).json({ message: "Invalid request parameters." });
         return;
@@ -157,7 +157,7 @@ export const getEventById = async (req: Request, res: Response) => {
 // PUT /api/events/rsvp
 export const rsvp = async (req: Request, res: Response) => {
     // Validate request body
-    const requestIsValid = validateSchema(req.body, 'rsvp');
+    const [requestIsValid, validationErrors] = validateSchema(req.body, 'rsvp');
     if (!requestIsValid) {
         res.status(400).json({ message: "Invalid request body." });
         return;
@@ -250,7 +250,7 @@ export const rsvp = async (req: Request, res: Response) => {
 
 export const getRsvpsForUser = async (req: AuthRequest, res: Response) => {
     // Validate request body
-    const requestIsValid = validateSchema(req.params, 'getUserRSVPs');
+    const [requestIsValid, validationErrors] = validateSchema(req.params, 'getUserRSVPs');
     if (!requestIsValid) {
         res.status(400).json({ message: "Invalid request parameters." });
         return;
@@ -330,13 +330,13 @@ export const modifyEvent = async (req: AuthRequest, res: Response) => {
 // DELETE /api/events/:id
 export const deleteEvent = async (req: AuthRequest, res: Response) => {
     // Validate request body
-    const requestIsValid = validateSchema(req.params, 'deleteEvent');
+    const [requestIsValid, validationErrors] = validateSchema(req.body, 'deleteEvent');
     if (!requestIsValid) {
-        res.status(400).json({ message: "Invalid request parameters." });
+        res.status(400).json({ message: "Invalid request parameters.", validationErrors });
         return;
     }
 
-    const { eventId } = req.params;
+    const { eventId } = req.body;
 
     try {
         const event = await prisma.event.delete({
@@ -353,7 +353,7 @@ export const deleteEvent = async (req: AuthRequest, res: Response) => {
                         email: true
                     }
                 }
-            }
+            },
         });
 
         if (!event) {
