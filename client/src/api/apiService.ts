@@ -246,7 +246,7 @@ export const modifyEvent = async ({ eventId, title, description, startDate, loca
 export const deleteEvent = async ({ eventId }: DeleteEventRequestParameters): Promise<{ event: Event, message?: string }> => {
     let res;
     try {
-        res = await API.delete(`/events/${eventId}`);
+        res = await API.delete(`/events/`, { data: { eventId } });
         const isValid = validateResponse(res.data, "deleteEvent");
 
         if (!isValid) {
