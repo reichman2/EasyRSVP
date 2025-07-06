@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { getEvents } from "../api/apiService";
+import { deleteEvent, getEvents } from "../api/apiService";
 import Badge from "../components/Badge";
 import { LuChevronLeft, LuChevronRight, LuPencil, LuTrash2 } from "react-icons/lu";
 import { Event } from "../utils/types";
@@ -16,6 +16,26 @@ const EventPage = () => {
     const [toast, setToast] = useState<ToastProps | null>(null);
     const [toastVisible, setToastVisible] = useState(false);
 
+    const [events, setEvents] = useState<any>({});
+
+    // TODO make this a hook
+    const fetchEvents = async () => {
+        let eventData;
+        try {
+            eventData = await getEvents({ limit: 10, offset: 0 });
+        } catch (err: any) {
+            console.error("Error fetching events:", err.message);
+            console.error(err);
+        }
+
+        if (eventData) {
+            setEvents(eventData);
+        }
+
+        console.log("Fetched events:", eventData);
+        return eventData;
+    };
+
     return (
         <div>
             { toast &&
@@ -30,20 +50,28 @@ const EventPage = () => {
                     close={ toast.close }
                 />
             }
-            <EventTable openCreateEventModal={ () => setIsCreateModalOpen(true) } />
+            <EventTable 
+                openCreateEventModal={ () => setIsCreateModalOpen(true) } 
+                setToast={ setToast }
+                toastVisible={ toastVisible }
+                setToastVisible={ setToastVisible }
+                events={ events }
+                fetchEvents={ fetchEvents }
+            />
             <CreateEventModal 
                 isOpen={ isCreateModalOpen } 
                 onClose={ () => setIsCreateModalOpen(false) } 
                 setToast={ setToast }
                 toastVisible={ toastVisible }
                 setToastVisible={ setToastVisible }
+                fetchEvents={ fetchEvents }
             />
         </div>
     );
 };
 
 
-const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVisible }: { isOpen: boolean, onClose: () => void, setToast: (toast: ToastProps | null) => void, toastVisible: boolean, setToastVisible: (visible: boolean) => void }) => {
+const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVisible, fetchEvents }: { isOpen: boolean, onClose: () => void, setToast: (toast: ToastProps | null) => void, toastVisible: boolean, setToastVisible: (visible: boolean) => void, fetchEvents: () => Promise<any> }) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [startDate, setStartDate] = useState("");
@@ -108,6 +136,9 @@ const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVis
                 visible: toastVisible,
                 close: () => setToastVisible(false)
             });
+
+            setToastVisible(true);
+            await fetchEvents();
         } catch (error) {
             console.error("Error creating event:", error);
 
@@ -205,27 +236,7 @@ const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVis
 };
 
 
-const EventTable = ({ openCreateEventModal }: { openCreateEventModal: () => void }) => {
-    const [events, setEvents] = useState<any>({});
-
-    // TODO make this a hook
-    const fetchEvents = async () => {
-        let eventData;
-        try {
-            eventData = await getEvents({ limit: 10, offset: 0 });
-        } catch (err: any) {
-            console.error("Error fetching events:", err.message);
-            console.error(err);
-        }
-
-        if (eventData) {
-            setEvents(eventData);
-        }
-
-        console.log("Fetched events:", eventData);
-        return eventData;
-    };
-
+const EventTable = ({ openCreateEventModal, setToast, toastVisible, setToastVisible, events, fetchEvents }: { openCreateEventModal: () => void, setToast: (toast: ToastProps) => void, toastVisible: boolean, setToastVisible: (visible: boolean) => void, events: any, fetchEvents: () => Promise<any> }) => {
     // Fetch events when the component mounts
     useEffect(() => {
         fetchEvents();
@@ -237,6 +248,42 @@ const EventTable = ({ openCreateEventModal }: { openCreateEventModal: () => void
         COMPLETED: <Badge text="Completed" color="green" />,
         CANCELLED: <Badge text="Cancelled" color="red" />
     }
+
+    const deleteEventHandler = async (eventId: string) => {
+        console.log("Deleting event with ID:", eventId);
+
+        try {
+            await deleteEvent({ eventId });
+            await fetchEvents();
+
+            setToast({
+                message: "Event deleted successfully!",
+                type: "success",
+                position: "top-right",
+                autoClose: true,
+                showCloseButton: true,
+                icon: null,
+                visible: toastVisible,
+                close: () => setToastVisible(false)
+            });
+
+            setToastVisible(true);
+        } catch (error: any) {
+            console.error("Error deleting event:", error.message);
+            setToast({
+                message: error instanceof Error? error.message : "An error occurred while deleting the event.",
+                type: "error",
+                position: "top-right",
+                autoClose: true,
+                showCloseButton: true,
+                icon: null,
+                visible: toastVisible,
+                close: () => setToastVisible(false)
+            });
+            setToastVisible(true);
+            return;
+        }
+    };
 
     const eventRows = events?.events?.map((event: Event, index: number) => (
         <tr key={ index } className={`border-gray-200 ${events.events.length - 1 === index? "" : "border-b"}`}>
@@ -261,7 +308,7 @@ const EventTable = ({ openCreateEventModal }: { openCreateEventModal: () => void
             <td scope="row" className="py-3 px-4 text-sm">
                 <div className="flex justify-center items-center space-x-4">
                     <button className="cursor-pointer hover:text-yellow-500"><LuPencil /></button>
-                    <button className="cursor-pointer hover:text-red-700"><LuTrash2 /></button>
+                    <button className="cursor-pointer hover:text-red-700" onClick={ () => deleteEventHandler(event.id) }><LuTrash2 /></button>
                 </div>
             </td>
         </tr>
