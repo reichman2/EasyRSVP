@@ -1,6 +1,6 @@
 export type User = {
     id: string;
-    firstNme: string;
+    firstName: string;
     lastName: string;
     email: string;
     createdAt: Date;
@@ -27,6 +27,7 @@ export type Event = {
     endDate?: Date;
     createdAt: Date;
     creatorId: string;
+    creator?: User;
     slug: string;
     rsvpToken: string;
     rsvps?: RSVP[];
