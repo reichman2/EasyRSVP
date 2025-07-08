@@ -23,7 +23,7 @@ EasyRSVP is an application designed to make sending, tracking, and managing invi
 
 
 ## Configuration
-You will need to specify environment variables for database connection and email sending*.  Create a `.env` file in the `/server` directory.  At a later date, more information will be required here in order to
+You will need to specify environment variables for database connection and email sending*.  Create a `.env` file in the `/server` directory.  At a later date, more information will be required here in order for full functionality.  **As of right now, you can ignore this if you are using docker.**
 ```env server/.env
 DATABASE_URL="postgresql://USERNAME:PASSOWRD@DB_SERVER_ADDR:DB_SERVER_PORT/DB_NAME?schema=public"
 JWT_SECRET="replacethisjwtsecretkeyforsecurelysigningsessiondata"
@@ -47,7 +47,7 @@ yarn install
 ```
 
 ### Running Locally
-For now, you can run by running a development build.  Coming shortly will be a way to deploy with docker
+#### Running in a development environment
 ```bash
 cd server
 npm run dev
@@ -56,6 +56,13 @@ cd client
 npm run dev
 ```
 Visit http://localhost:5173
+
+#### Running in a docker container
+Clone the repository if you haven't already.  Once this is done, cd into the project's root directory and run the following:
+```bash
+docker-compose up --build
+```
+Visit http://localhost:3000
 
 
 ## Contributing

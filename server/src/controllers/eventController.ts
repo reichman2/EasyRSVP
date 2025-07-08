@@ -19,7 +19,7 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
         return;
     }
 
-    const { title, description, startDate, location } = req.body;
+    const { title, description, startDate, endDate, location } = req.body;
     const userId = req.userId;
 
     try {
@@ -28,6 +28,7 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
                 title: title as string,
                 description: description as string,
                 startDate: new Date(startDate),
+                endDate: endDate ? new Date(endDate) : undefined, // endDate is optional
                 location: location as string,
                 
                 creatorId: userId as string,
