@@ -47,7 +47,7 @@ yarn install
 ```
 
 ### Running Locally
-For now, you can run by running a development build.  Coming shortly will be a way to deploy with docker
+#### Running in a development environment
 ```bash
 cd server
 npm run dev
@@ -56,6 +56,13 @@ cd client
 npm run dev
 ```
 Visit http://localhost:5173
+
+#### Running in a docker container
+Clone the repository if you haven't already.
+```bash
+docker-compose up --build
+```
+Visit http://localhost:3000
 
 
 ## Contributing
