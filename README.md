@@ -58,7 +58,7 @@ npm run dev
 Visit http://localhost:5173
 
 #### Running in a docker container
-Clone the repository if you haven't already.
+Clone the repository if you haven't already.  Once this is done, cd into the project's root directory and run the following:
 ```bash
 docker-compose up --build
 ```
