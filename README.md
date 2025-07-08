@@ -23,7 +23,7 @@ EasyRSVP is an application designed to make sending, tracking, and managing invi
 
 
 ## Configuration
-You will need to specify environment variables for database connection and email sending*.  Create a `.env` file in the `/server` directory.  At a later date, more information will be required here in order to
+You will need to specify environment variables for database connection and email sending*.  Create a `.env` file in the `/server` directory.  At a later date, more information will be required here in order for full functionality.  **As of right now, you can ignore this if you are using docker.**
 ```env server/.env
 DATABASE_URL="postgresql://USERNAME:PASSOWRD@DB_SERVER_ADDR:DB_SERVER_PORT/DB_NAME?schema=public"
 JWT_SECRET="replacethisjwtsecretkeyforsecurelysigningsessiondata"
