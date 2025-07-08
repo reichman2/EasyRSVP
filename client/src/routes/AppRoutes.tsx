@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useParams } from 'react-router';
+import { Routes, Route, Navigate } from 'react-router';
 import { useAuth } from '../context/AuthContext';
 import { JSX, useEffect } from 'react';
 import LoginPage from '../pages/LoginPage';

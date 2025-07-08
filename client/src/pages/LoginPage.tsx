@@ -4,7 +4,6 @@ import "../assets/styles/LoginPage.css";
 import Input from "../components/Input";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import API from "../api/axios";
 import { loginUser } from "../api/apiService";
 
 

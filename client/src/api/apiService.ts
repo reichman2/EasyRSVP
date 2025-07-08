@@ -10,7 +10,7 @@ import * as getEventsResponseSchema from "../../schemas/GetEventsResponse.json";
 import * as rsvpResponseSchema from "../../schemas/RSVPResponse.json";
 import * as deleteEventResponseSchema from "../../schemas/DeleteEventResponse.json";
 import * as modifyEventResponseSchema from "../../schemas/ModifyEventResponse.json";
-import * as getRSVPsResponseSchema from "../../schemas/GetRsvpsResponse.json";
+import * as getRSVPsResponseSchema from "../../schemas/GetRSVPsResponse.json";
 
 import * as eventObjectSchema from "../../schemas/objects/Event.json";
 import * as rsvpObjectSchema from "../../schemas/objects/RSVP.json";
@@ -89,12 +89,20 @@ const OBJECT_SCHEMAS = [
 export const validateResponse = (obj: any, schema: keyof typeof SCHEMAS) => {
     if (obj && schema) {
         const validator = new ajv({ schemas: OBJECT_SCHEMAS, coerceTypes: true });
-        addFormats(validator);
+        addFormats(validator, ["date-time", "email", "uuid"]);
         const validate = validator.compile(SCHEMAS[schema]);
 
-        return validate(obj);
+        const isValid = validate(obj);
+
+        if (!isValid) {
+            console.error("Validation errors:", validate.errors);
+            return false;
+        }
+
+        return true;
     }
 
+    console.log("Object to validate is undefined or null.");
     return false;
 };
 
