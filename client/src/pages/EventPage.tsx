@@ -10,6 +10,7 @@ import Input from "../components/Input";
 import { createEvent } from "../api/apiService";
 import TextArea from "../components/TextArea";
 import Toast, { ToastProps } from "../components/Toast";
+import { useSearchParams } from "react-router";
 
 const EventPage = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -20,6 +21,9 @@ const EventPage = () => {
 
     const [eventToEdit, setEventToEdit] = useState<Event | null>(null);
     const [editEventModalOpen, setEditEventModalOpen] = useState(false);
+
+    // Get search params from the URL
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // TODO make this a hook
     const fetchEvents = async () => {
@@ -38,6 +42,30 @@ const EventPage = () => {
         console.log("Fetched events:", eventData);
         return eventData;
     };
+
+    useEffect(() => {
+        if (!events.events) {
+            return;
+        }
+
+        // If there is an event ID in the search params, open the edit modal
+        const editEventId = searchParams.get("editEventId");
+        if (editEventId) {
+            const eventToEdit = events.events?.find((event: Event) => event.id === editEventId);
+
+            if (!eventToEdit) {
+                console.error("Event not found for ID:", editEventId);
+                return;
+            }
+            
+            setEventToEdit(eventToEdit);
+            setEditEventModalOpen(true);
+
+            // Remove the editEventId from the search params
+            searchParams.delete("editEventId");
+            setSearchParams(searchParams);
+        }
+    }, [events]);
 
     return (
         <div>
