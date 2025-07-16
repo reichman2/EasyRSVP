@@ -105,14 +105,6 @@ const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVis
     const [titleError, setTitleError] = useState("");
     const [startDateError, setStartDateError] = useState("");
 
-    if (event) {
-        setTitle(event.title);
-        setDescription(event.description);
-        setStartDate(event.startDate.toISOString());
-        setEndDate(event.endDate?.toISOString() || "");
-        setLocation(event.location);
-    }
-
     const closeModal = () => {
         setTitle("");
         setDescription("");
@@ -293,7 +285,7 @@ const EditEventModal = ({ isOpen, onClose, event, setToast, toastVisible, setToa
         setStartDate(convertDateToInputFormat(event.startDate));
         setEndDate(convertDateToInputFormat(event.endDate));
         setLocation(event.location);
-    }, [event]);
+    }, [event, isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -355,6 +347,11 @@ const EditEventModal = ({ isOpen, onClose, event, setToast, toastVisible, setToa
         }
     };
 
+    const handleClose = (e: React.MouseEvent) => {
+        e.preventDefault();
+        onClose();
+    };
+
     return (
         <Modal isOpen={ isOpen } close={ onClose }>
             <div className="md:w-xl sm:w-sm">
@@ -408,7 +405,7 @@ const EditEventModal = ({ isOpen, onClose, event, setToast, toastVisible, setToa
                         />
                     </div>
                     <div className="flex flex-row justify-between space-x-8">
-                        <button className="rounded-md cursor-pointer w-full text-sm py-1.5 bg-gray-200 font-medium">Cancel</button>
+                        <button className="rounded-md cursor-pointer w-full text-sm py-1.5 bg-gray-200 font-medium" onClick={ handleClose }>Cancel</button>
                         <Button type="submit" className="py-1.5">Update Event</Button>
                     </div>
                 </form>
