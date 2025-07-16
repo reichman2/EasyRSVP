@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { deleteEvent, getEvents } from "../api/apiService";
+import { deleteEvent, getEvents, modifyEvent } from "../api/apiService";
 import Badge from "../components/Badge";
 import { LuChevronLeft, LuChevronRight, LuPencil, LuTrash2 } from "react-icons/lu";
 import { Event } from "../utils/types";
@@ -17,6 +17,9 @@ const EventPage = () => {
     const [toastVisible, setToastVisible] = useState(false);
 
     const [events, setEvents] = useState<any>({});
+
+    const [eventToEdit, setEventToEdit] = useState<Event | null>(null);
+    const [editEventModalOpen, setEditEventModalOpen] = useState(false);
 
     // TODO make this a hook
     const fetchEvents = async () => {
@@ -57,10 +60,21 @@ const EventPage = () => {
                 setToastVisible={ setToastVisible }
                 events={ events }
                 fetchEvents={ fetchEvents }
+                setEventToEdit={ setEventToEdit }
+                setEditEventModalOpen={ setEditEventModalOpen }
             />
             <CreateEventModal 
                 isOpen={ isCreateModalOpen } 
                 onClose={ () => setIsCreateModalOpen(false) } 
+                setToast={ setToast }
+                toastVisible={ toastVisible }
+                setToastVisible={ setToastVisible }
+                fetchEvents={ fetchEvents }
+            />
+            <EditEventModal 
+                isOpen={ editEventModalOpen } 
+                onClose={ () => setEditEventModalOpen(false) } 
+                event={ eventToEdit }
                 setToast={ setToast }
                 toastVisible={ toastVisible }
                 setToastVisible={ setToastVisible }
@@ -71,7 +85,17 @@ const EventPage = () => {
 };
 
 
-const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVisible, fetchEvents }: { isOpen: boolean, onClose: () => void, setToast: (toast: ToastProps | null) => void, toastVisible: boolean, setToastVisible: (visible: boolean) => void, fetchEvents: () => Promise<any> }) => {
+interface CreateEventModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    setToast: (toast: ToastProps | null) => void;
+    toastVisible: boolean;
+    setToastVisible: (visible: boolean) => void;
+    fetchEvents: () => Promise<any>;
+    event?: Event;
+}
+
+const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVisible, fetchEvents, event }: CreateEventModalProps) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [startDate, setStartDate] = useState("");
@@ -81,6 +105,13 @@ const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVis
     const [titleError, setTitleError] = useState("");
     const [startDateError, setStartDateError] = useState("");
 
+    if (event) {
+        setTitle(event.title);
+        setDescription(event.description);
+        setStartDate(event.startDate.toISOString());
+        setEndDate(event.endDate?.toISOString() || "");
+        setLocation(event.location);
+    }
 
     const closeModal = () => {
         setTitle("");
@@ -164,12 +195,8 @@ const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVis
 
         const date = new Date(value);
         const datePlusTwoHours = new Date(date.getTime() + 2 * 60 * 60 * 1000); // Add 2 hours
-        // Account for timezone offset
-        const timezoneOffset = datePlusTwoHours.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
-        const adjustedDate = new Date(datePlusTwoHours.getTime() - timezoneOffset);
-
-        // Format the date to match the input type="datetime-local" format
-        const formattedDate = adjustedDate.toISOString().slice(0, 16);
+        
+        const formattedDate = convertDateToInputFormat(datePlusTwoHours);
         setEndDate(formattedDate);
     }
 
@@ -235,8 +262,173 @@ const CreateEventModal = ({ isOpen, onClose, setToast, toastVisible, setToastVis
     )
 };
 
+interface EditEventModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    event: Event | null;
+    setToast: (toast: ToastProps | null) => void;
+    toastVisible: boolean;
+    setToastVisible: (visible: boolean) => void;
+    fetchEvents: () => Promise<any>;
+}
 
-const EventTable = ({ openCreateEventModal, setToast, toastVisible, setToastVisible, events, fetchEvents }: { openCreateEventModal: () => void, setToast: (toast: ToastProps) => void, toastVisible: boolean, setToastVisible: (visible: boolean) => void, events: any, fetchEvents: () => Promise<any> }) => {
+const EditEventModal = ({ isOpen, onClose, event, setToast, toastVisible, setToastVisible, fetchEvents }: EditEventModalProps) => {
+    if (!event) {
+        return null;
+    }
+
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [location, setLocation] = useState("");
+
+    useEffect(() => {
+        if (!event || !event.endDate) {
+            return;
+        }
+
+        setTitle(event.title);
+        setDescription(event.description);
+        setStartDate(convertDateToInputFormat(event.startDate));
+        setEndDate(convertDateToInputFormat(event.endDate));
+        setLocation(event.location);
+    }, [event]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!title || !startDate) {
+            setToast({
+                message: "Event title and start date are required.",
+                type: "error",
+                position: "top-right",
+                autoClose: true,
+                showCloseButton: true,
+                icon: null,
+                visible: toastVisible,
+                close: () => setToastVisible(false)
+            });
+            setToastVisible(true);
+            return;
+        }
+
+        try {
+            await modifyEvent({
+                eventId: event.id,
+                title,
+                description,
+                startDate: new Date(startDate).toISOString(),
+                endDate: endDate? new Date(endDate).toISOString() : "",
+                location
+            });
+
+            onClose();
+            setToast({
+                message: "Event updated successfully!",
+                type: "success",
+                position: "top-right",
+                autoClose: true,
+                showCloseButton: true,
+                icon: null,
+                visible: toastVisible,
+                close: () => setToastVisible(false)
+            });
+
+            setToastVisible(true);
+            await fetchEvents();
+        } catch (error) {
+            console.error("Error updating event:", error);
+
+            setToast({
+                message: error instanceof Error? error.message : "An error occurred while updating the event.",
+                type: "error",
+                position: "top-right",
+                autoClose: true,
+                showCloseButton: true,
+                icon: null,
+                visible: toastVisible,
+                close: () => setToastVisible(false)
+            });
+
+            setToastVisible(true);
+        }
+    };
+
+    return (
+        <Modal isOpen={ isOpen } close={ onClose }>
+            <div className="md:w-xl sm:w-sm">
+                <h2 className="text-2xl mb-4">Edit Event</h2>
+                <form className="space-y-4" onSubmit={ handleSubmit }>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Event Title</label>
+                        <Input 
+                            name="edit-event-title" 
+                            type="text" 
+                            value={ title }
+                            onChange={ (e) => setTitle(e.target.value) }
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Event Description</label>
+                        <TextArea 
+                            name="new-event-desc" 
+                            rows={ 4 } 
+                            value={ description }
+                            onChange={ (e) => setDescription(e.target.value) }
+                        />
+                    </div>
+                    <div className="flex flex-row justify-between space-x-4">
+                        <div className="grow">
+                            <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                            <Input 
+                                type="datetime-local"
+                                name="edit-start-date"
+                                value={ startDate }
+                                onChange={ (e) => setStartDate(e.target.value) }
+                            />
+                        </div>
+                        <div className="grow">
+                            <label className="block text-sm font-medium text-gray-700">End Date</label>
+                            <Input
+                                type="datetime-local"
+                                name="edit-end-date"
+                                value={ endDate }
+                                onChange={ (e) => setEndDate(e.target.value) }
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Location</label>
+                        <Input
+                            type="text"
+                            name="edit-location"
+                            value={ location }
+                            onChange={ (e) => setLocation(e.target.value) }
+                        />
+                    </div>
+                    <div className="flex flex-row justify-between space-x-8">
+                        <button className="rounded-md cursor-pointer w-full text-sm py-1.5 bg-gray-200 font-medium">Cancel</button>
+                        <Button type="submit" className="py-1.5">Update Event</Button>
+                    </div>
+                </form>
+            </div>
+        </Modal>
+    );
+};
+
+interface EventTableProps {
+    openCreateEventModal: () => void;
+    setToast: (toast: ToastProps) => void;
+    toastVisible: boolean;
+    setToastVisible: (visible: boolean) => void;
+    events: any;
+    fetchEvents: () => Promise<any>;
+    setEventToEdit: (event: Event | null) => void;
+    setEditEventModalOpen: (isOpen: boolean) => void;
+}
+
+const EventTable = ({ openCreateEventModal, setToast, toastVisible, setToastVisible, events, fetchEvents, setEventToEdit, setEditEventModalOpen }: EventTableProps) => {
     // Fetch events when the component mounts
     useEffect(() => {
         fetchEvents();
@@ -280,9 +472,15 @@ const EventTable = ({ openCreateEventModal, setToast, toastVisible, setToastVisi
                 visible: toastVisible,
                 close: () => setToastVisible(false)
             });
+
             setToastVisible(true);
             return;
         }
+    };
+
+    const openEditEventModal = (event: Event) => {
+        setEventToEdit(event);
+        setEditEventModalOpen(true);
     };
 
     const eventRows = events?.events?.map((event: Event, index: number) => (
@@ -307,7 +505,7 @@ const EventTable = ({ openCreateEventModal, setToast, toastVisible, setToastVisi
             <td scope="row" className="py-3 px-4 text-sm text-center">{ statusBadges[event.status] }</td>
             <td scope="row" className="py-3 px-4 text-sm">
                 <div className="flex justify-center items-center space-x-4">
-                    <button className="cursor-pointer hover:text-yellow-500"><LuPencil /></button>
+                    <button className="cursor-pointer hover:text-yellow-500" onClick={ () => openEditEventModal(event) }><LuPencil /></button>
                     <button className="cursor-pointer hover:text-red-700" onClick={ () => deleteEventHandler(event.id) }><LuTrash2 /></button>
                 </div>
             </td>
@@ -390,6 +588,22 @@ const formatTime = (date: Date) => {
     });
 
     return formatter.format(date);
-}
+};
+
+const convertDateToInputFormat = (date: Date | string) => {
+    // Ensure the date is of type Date;
+    if (typeof date === "string") {
+        date = new Date(date);
+    }
+
+    // Account for timezone offset
+    const timezoneOffset = date.getTimezoneOffset() * 60000; // Convert minutes to milliseconds
+    const adjustedDate = new Date(date.getTime() - timezoneOffset);
+
+    // Format the date to match the input type="datetime-local" format
+    const formattedDate = adjustedDate.toISOString().slice(0, 16);
+
+    return formattedDate;
+};
 
 export default EventPage;
