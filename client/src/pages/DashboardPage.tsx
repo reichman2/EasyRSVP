@@ -214,6 +214,7 @@ const EventList = ({ events, setIsDeletedModalOpen, setEventToDelete, setViewEve
         }
 
         const handleView = () => {
+            setDropdownId(null); // Close dropdown after action (particularly for view from dropdown).
             setViewEvent(event);
             setIsViewEventModalOpen(true);
         };
@@ -229,6 +230,9 @@ const EventList = ({ events, setIsDeletedModalOpen, setEventToDelete, setViewEve
             setDropdownId(null); // Close dropdown after action
         };
 
+        const handleInvite = () => {
+            console.log("Invite to event:", event.title);
+        };
 
         return (
             <li className="relative bg-white shadow-md rounded-lg p-4 grow" key={ key }>
@@ -271,6 +275,12 @@ const EventList = ({ events, setIsDeletedModalOpen, setEventToDelete, setViewEve
                     <ul className="text-sm text-gray-700">
                         <li className="hover:bg-gray-100 rounded-t-md">
                             <button className="m-0 p-2 w-full text-left cursor-pointer" onClick={ handleEdit }>Edit</button>
+                        </li>
+                        <li className="hover:bg-gray-100">
+                            <button className="m-0 p-2 w-full text-left cursor-pointer" onClick={ handleInvite }>Invite</button>
+                        </li>
+                        <li className="hover:bg-gray-100">
+                            <button className="m-0 p-2 w-full text-left cursor-pointer" onClick={ handleView }>View</button>
                         </li>
                         <li className="hover:bg-gray-100 rounded-b-md">
                             <button className="m-0 p-2 w-full text-left cursor-pointer" onClick={ handleDelete }>Delete</button>
