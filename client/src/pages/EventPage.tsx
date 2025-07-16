@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { deleteEvent, getEvents, modifyEvent } from "../api/apiService";
 import Badge from "../components/Badge";
-import { LuChevronLeft, LuChevronRight, LuPencil, LuTrash2 } from "react-icons/lu";
+import { LuChevronLeft, LuChevronRight, LuMail, LuPencil, LuTrash2 } from "react-icons/lu";
 import { Event } from "../utils/types";
 import Button from "../components/Button";
 import Modal from "../components/Modal";
@@ -475,6 +475,12 @@ const EventTable = ({ openCreateEventModal, setToast, toastVisible, setToastVisi
         }
     };
 
+    const openInviteModal = (e: React.MouseEvent, event: Event) => {
+        console.log("Invite button pressed for event:", event);
+        e.stopPropagation();
+        // TODO Open the invite modal and pass the event details
+    };
+
     const openEditEventModal = (event: Event) => {
         setEventToEdit(event);
         setEditEventModalOpen(true);
@@ -503,6 +509,7 @@ const EventTable = ({ openCreateEventModal, setToast, toastVisible, setToastVisi
             <td scope="row" className="py-3 px-4 text-sm">
                 <div className="flex justify-center items-center space-x-4">
                     <button className="cursor-pointer hover:text-yellow-500" onClick={ () => openEditEventModal(event) }><LuPencil /></button>
+                    <button className="cursor-pointer hover:text-blue-700" onClick={ (e) => openInviteModal(e, event) }><LuMail /></button>
                     <button className="cursor-pointer hover:text-red-700" onClick={ () => deleteEventHandler(event.id) }><LuTrash2 /></button>
                 </div>
             </td>
