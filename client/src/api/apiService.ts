@@ -53,6 +53,7 @@ type ModifyEventRequestParameters = {
     title?: string;
     description?: string;
     startDate?: Date | string;
+    endDate?: Date | string;
     location?: string;
 };
 
@@ -230,13 +231,13 @@ export const getDetailedEvent = async ({ eventId }: GetDetailedEventRequestParam
     return res.data;
 };
 
-export const modifyEvent = async ({ eventId, title, description, startDate, location }: ModifyEventRequestParameters): Promise<{ event: Event, message?: string }> => {
+export const modifyEvent = async ({ eventId, title, description, startDate, endDate, location }: ModifyEventRequestParameters): Promise<{ event: Event, message?: string }> => {
     let res;
     try {
-        res = await API.put(`/events/${eventId}`, { eventId, title, description, startDate, location});
-        const isValid = validateResponse(res.data, "createEvent");
+        res = await API.put(`/events`, { eventId, title, description, startDate, endDate, location });
+        const isValid = validateResponse(res.data, "modifyEvent");
 
-        if (isValid) {
+        if (!isValid) {
             throw new Error("Response for \"PUT /api/events/:id\" did not pass validation.");
         }
     } catch (err: any) {
