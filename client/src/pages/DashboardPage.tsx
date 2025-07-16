@@ -220,7 +220,8 @@ const EventList = ({ events, setIsDeletedModalOpen, setEventToDelete, setViewEve
         };
 
         const handleEdit = () => {
-            console.log("Edit event:", event.title);
+            // Redirect to the event management page.
+            window.location.href = `/events?editEventId=${event.id}`;
         };
 
         const handleDelete = () => {
