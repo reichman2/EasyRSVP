@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { AuthRequest } from '../middleware/authMiddleware';
 import validateSchema from '../utils/validateSchema';
+import { sendEventChangeEmail, sendInviteEmail } from '../utils/mailer';
 
 
 const prisma = new PrismaClient();
@@ -300,6 +301,14 @@ export const modifyEvent = async (req: AuthRequest, res: Response) => {
                 startDate: startDate? new Date(startDate) : undefined,
                 endDate: endDate? new Date(endDate) : undefined,
                 location: location || undefined
+            },
+            include: {
+                creator: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
+                }
             }
         });
 
@@ -309,16 +318,46 @@ export const modifyEvent = async (req: AuthRequest, res: Response) => {
         }
 
         // TODO -- send email to all users who have RSVP'd to the event.
-
-        if (startDate) {
-            // console.log("new start date, we should remove all RSVPs");
-
-            // Remove all RSVPs for the event
-            await prisma.rSVP.deleteMany({
-                where: {
-                    eventId
+        const rsvps = await prisma.rSVP.findMany({
+            where: {
+                eventId: event.id,
+            },
+            include: {
+                user: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                        email: true
+                    }
                 }
-            });
+            }
+        });
+
+        for (const rsvp of rsvps) {
+            // Build the recipient object
+            let recipient;
+            if (rsvp.user) {
+                recipient = {
+                    email: rsvp.user.email,
+                    name: rsvp.user.firstName + " " + rsvp.user.lastName
+                }
+            } else {
+                recipient = {
+                    email: rsvp.email,
+                    name: rsvp.name
+                }
+            }
+
+            // Send the email
+            try {
+                console.log("Sending modify event email to", recipient.email);
+                // DON'T await here, we want to send the emails in parallel so the response is not delayed.
+                // we may have to handle some issues here later.
+                sendEventChangeEmail(event, recipient, "The event details have been changed.");
+            } catch (err) {
+                console.error("Error sending email to", recipient.email, err);
+                // TODO -- handle email sending failure (we should let the user know that some emails failed to send)
+            }
         }
 
         res.status(200).json({ message: "Event updated successfully.", event });
@@ -377,3 +416,52 @@ export const deleteEvent = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ message: serverErrorMessage });
     }
 }
+
+export const invite = async (req: AuthRequest, res: Response) => {
+    // Validate request body
+    // (todo)
+
+    const { eventId, recipients } = req.body as { eventId: string, recipients: { email: string, name: string}[] };
+    const userId = req.userId;
+
+    const event = await prisma.event.findUnique({
+        where: {
+            id: eventId,
+            creatorId: userId
+        },
+        include: {
+            creator: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true
+                }
+            }
+        }
+    });
+
+    if (!event) {
+        res.status(404).json({ message: "Invalid user or event id." });
+        return;
+    }
+
+    let failed = false;
+    
+    for (const recipient of recipients) {
+        try {
+            console.log("Sending invite email to", recipient.email);
+            await sendInviteEmail(event, recipient);
+        } catch (err) {
+            failed = true;
+            console.error("Error sending invite email to", recipient.email, err);
+            console.log("continuing...");
+        }
+    }
+
+    if (failed) {
+        res.status(500).json({ message: "Some invite emails failed to send. Check server logs for details." });
+        return;
+    }
+
+    res.status(200).json({ message: "Invite email sent successfully." });
+};
