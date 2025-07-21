@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createEvent, deleteEvent, getEventById, getEvents, getRsvpsForUser, modifyEvent, rsvp } from '../controllers/eventController';
+import { createEvent, deleteEvent, getEventById, getEvents, getRsvpsForUser, invite, modifyEvent, rsvp } from '../controllers/eventController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 
@@ -14,5 +14,8 @@ router.put('/rsvp', rsvp);
 router.get('/:eventId', getEventById);
 router.delete('/', authMiddleware, deleteEvent);
 router.put('/', authMiddleware, modifyEvent);
+
+// Invite endpoints
+router.post('/invite', authMiddleware, invite);
 
 export default router;
