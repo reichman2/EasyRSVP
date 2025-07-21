@@ -6,6 +6,7 @@ import { LuEllipsis, LuPencil } from "react-icons/lu";
 import Badge from "../components/Badge";
 import Modal from "../components/Modal";
 import Toast, { ToastProps } from "../components/Toast";
+import { formatDate, titleCase } from "../utils/formatUtils";
 
 const DashboardPage = () => {
     // States to hold event and rsvp data from the server.
@@ -423,27 +424,6 @@ const ViewEventModal = ({ isOpen, onClose, event }: { isOpen: boolean, onClose: 
             </div>
         </Modal>
     );
-}
-
-
-const formatDate = (date: Date) => {
-    // TODO should this be a utility function? (moved to utils dir)
-    const formatter = new Intl.DateTimeFormat("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true
-    });
-
-    return formatter.format(date);
-}
-
-const titleCase = (str: string) => {
-    return str.replace(/\w\S*/g, (txt) => {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
 }
 
 export default DashboardPage;
