@@ -1,16 +1,19 @@
 type BadgeProps = {
     text: string;
-    color: "gray" | "red" | "orange" | "yellow" | "green" | "blue" | "indigo" | "purple" | "pink";
+    color: "white" | "lightgray" | "gray" | "red" | "orange" | "yellow" | "green" | "blue" | "indigo" | "purple" | "pink";
     styles?: string[];
     closable?: boolean;
     onClose?: () => void;
     className?: string;
     showBorder?: boolean;
+    title?: string;
 };
 
 
-const Badge = ({ text, color, closable, onClose, className, showBorder }: BadgeProps) => {
+const Badge = ({ text, color, closable, onClose, className, showBorder, title }: BadgeProps) => {
     const badgeColorClasses = {
+        white: `bg-white text-gray-800 ${showBorder? "ring-gray-500/10" : ""}`,
+        lightgray: `bg-gray-100 text-gray-800 ${showBorder? "ring-gray-500/10" : ""}`,
         gray: `bg-gray-200 text-gray-800 ${showBorder? "ring-gray-500/10" : ""}`,
         red: `bg-red-200 text-red-800 ${showBorder? "ring-red-600/10" : ""}`,
         orange: `bg-orange-200 text-orange-800 ${showBorder? "ring-orange-600/10" : ""}`,
@@ -23,10 +26,10 @@ const Badge = ({ text, color, closable, onClose, className, showBorder }: BadgeP
     };
 
     return (
-        <span className={`inline-flex items-center px-2 py-1 text-xs rounded-md font-medium ${badgeColorClasses[color]} ${className} ${showBorder? "ring-1 ring-inset" : ""}`}>
+        <span className={`inline-flex items-center px-2 py-1 text-xs rounded-md font-medium ${badgeColorClasses[color]} ${className} ${showBorder? "ring-1 ring-inset" : ""}`} title={ title }>
             {text}
             {closable && (
-                <button onClick={onClose} className="ml-2 opacity-50 hover:opacity-80 cursor-pointer">
+                <button type="button" onClick={onClose} className="ml-2 opacity-50 hover:opacity-80 cursor-pointer">
                     &times;
                 </button>
             )}
