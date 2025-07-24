@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "get event",
+    "description": "Defines the basic structure of a createEvent response.",
+    "type": "object",
+    "properties": {
+        "message": {
+            "type": "string",
+            "description": "A message with more information about the response (ie. success/error details)."
+        }
+    }
+}

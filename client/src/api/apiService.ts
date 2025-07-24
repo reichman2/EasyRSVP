@@ -11,6 +11,7 @@ import * as rsvpResponseSchema from "../../schemas/RSVPResponse.json";
 import * as deleteEventResponseSchema from "../../schemas/DeleteEventResponse.json";
 import * as modifyEventResponseSchema from "../../schemas/ModifyEventResponse.json";
 import * as getRSVPsResponseSchema from "../../schemas/GetRSVPsResponse.json";
+import * as sendInvitesResponseSchema from "../../schemas/SendInvitesResponse.json";
 
 import * as eventObjectSchema from "../../schemas/objects/Event.json";
 import * as rsvpObjectSchema from "../../schemas/objects/RSVP.json";
@@ -79,7 +80,8 @@ const SCHEMAS = {
     getDetailedEvent: getDetailedEventResposneSchema,
     getEvents: getEventsResponseSchema,
     rsvp: rsvpResponseSchema,
-    getRsvps: getRSVPsResponseSchema
+    getRsvps: getRSVPsResponseSchema,
+    sendInvites: sendInvitesResponseSchema
 };
 
 const OBJECT_SCHEMAS = [
@@ -314,3 +316,24 @@ export const getRsvps = async (): Promise<{ rsvps: RSVP[], message?: string }> =
 
     return res.data;
 };
+
+export const inviteAttendees = async ({ eventId, invitees }: { eventId: string, invitees: { name: string, email: string }[] }): Promise<{ message?: string }> => {
+    let res;
+    try {
+        res = await API.post("/events/invite", { eventId, recipients: invitees });
+        const isValid = validateResponse(res.data, "createEvent");
+
+        if (!isValid) {
+            throw new Error("Response for \"POST /api/events/invite\" did not pass validation.");
+        }
+    } catch (err: any) {
+        const message = err.response?.data?.message;
+        if (message) {
+            throw new Error(message);
+        }
+
+        throw err;
+    }
+
+    return res.data;
+}
