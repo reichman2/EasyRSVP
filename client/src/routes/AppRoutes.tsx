@@ -5,6 +5,7 @@ import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import DashboardPage from '../pages/DashboardPage';
 import EventPage from '../pages/EventPage';
+import { DetailedEventPage } from '../pages/DetailedEventPage';
 
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -32,10 +33,11 @@ const AppRoutes = () => {
             <Route path="/" element={ <ProtectedRoute><h1>/</h1></ProtectedRoute> } />
             <Route path="/dashboard" element={ <ProtectedRoute><DashboardPage /></ProtectedRoute> } />
             <Route path="/events" element={ <ProtectedRoute><EventPage /></ProtectedRoute> } />
+            <Route path="/event/:id" element={ <ProtectedRoute><DetailedEventPage /></ProtectedRoute> } />
             <Route path="/login" element={ <LoggedOutOnlyRoute><LoginPage /></LoggedOutOnlyRoute> } />
             <Route path="/register" element={ <LoggedOutOnlyRoute><RegisterPage /></LoggedOutOnlyRoute> } />
             <Route path="/logout" element={ <ProtectedRoute><Logout /></ProtectedRoute> } />
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<Navigate to="/dashboard" />} />
 
             {/* TODO -- add error pages. */}
         </Routes>

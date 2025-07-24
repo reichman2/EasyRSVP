@@ -232,6 +232,11 @@ const EventList = ({ events, setIsDeletedModalOpen, setEventToDelete, setViewEve
             setDropdownId(null); // Close dropdown after action
         };
 
+        const handleGoToEventPage = () => {
+            // Redirect to the detailed event page.
+            window.location.href = `/event/${event.id}`;
+        }
+
         const handleInvite = () => {
             console.log("Invite to event:", event.title);
         };
@@ -282,7 +287,7 @@ const EventList = ({ events, setIsDeletedModalOpen, setEventToDelete, setViewEve
                             <button className="m-0 p-2 w-full text-left cursor-pointer" onClick={ handleInvite }>Invite</button>
                         </li>
                         <li className="hover:bg-gray-100">
-                            <button className="m-0 p-2 w-full text-left cursor-pointer" onClick={ handleView }>View</button>
+                            <button className="m-0 p-2 w-full text-left cursor-pointer" onClick={ handleGoToEventPage }>Details</button>
                         </li>
                         <li className="hover:bg-gray-100 rounded-b-md">
                             <button className="m-0 p-2 w-full text-left cursor-pointer" onClick={ handleDelete }>Delete</button>
